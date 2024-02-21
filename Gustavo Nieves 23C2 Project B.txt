@@ -1,0 +1,53 @@
+import socket
+import datetime
+
+scn_fl = open("Gus Bus Port Scans.txt", "w")
+scn_fl.write("Boarding All Ports!!\n\n")
+
+check = ""
+
+while check !="ok":
+
+    try:
+        sr_trgt = input("Please pick a host to scan: ")
+        trgt_ip = socket.gethostbyname(sr_trgt)
+        check = "ok"
+
+    except socket.gaierror:
+        print("Bad Target Detected")
+        scn_fl.write("Bad Target Detected")
+        check = "NO"
+
+i = 1
+
+ti = datetime.datetime.now()
+scn_fl.write("Start Scanning Time: ")
+scn_fl.write(str(ti) + "\n\n")
+
+# The next code was found through GitHub
+socket.setdefaulttimeout(4)   # Update number after testing how long ports take
+
+while i <= 1025:
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    stts = s.connect_ex((trgt_ip, i))
+
+    print("Port #:{} - Status Code: {}".format(i, stts))
+
+    if stts == 0:
+            scn_fl.write(" Port {} is open\n".format(i))
+    elif stts == 10061:
+        print("Connection Refused on port #:{}".format(i))
+
+    i += 1
+
+tf = datetime.datetime.now()
+scn_fl.write("Ending Scanning Time: ")
+scn_fl.write(str(tf) + "\n")
+
+tt = tf-ti
+
+scn_fl.write("Total Time Scanned: ")
+scn_fl.write(str(tt) + "\n")
+
+scn_fl.close()
